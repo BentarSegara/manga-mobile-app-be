@@ -14,17 +14,13 @@ export const getDetailComic = async (slug) => {
       const hImageMod = hImage.replace(/quality=\d+/, "quality=100");
 
       const detailSection = document.querySelector(".perapih article");
-      const judul = detailSection.querySelector("#Judul");
       const informations = detailSection.querySelector("#Informasi");
 
-      const vImageEl = informations.querySelector(".ims");
-      const vImage = vImageEl.querySelector("img").src;
+      const vImage = informations.querySelector("img").src;
 
       const tbody = informations.querySelector(".inftable tbody");
       const tr = tbody.querySelectorAll("tr td:last-child");
-      const title = tr[0].innerText;
       const comic = tr[2].innerText;
-      const genre = tr[3].innerText;
       const author = tr[4].innerText;
       const status = tr[5].innerText;
 
@@ -37,21 +33,14 @@ export const getDetailComic = async (slug) => {
 
       const synopsis = informations.querySelector(".desc").innerText;
 
-      const lastChapter = judul.querySelector(".new1.sd.rd:last-child");
-      const span = lastChapter.querySelector("a span:last-child");
-      const chapter = span.innerText;
-
       return {
-        title: title,
         author: author,
         status: status,
         comic: comic,
-        genre: genre,
         genres: genres,
         synopsis: synopsis,
-        total_chapter: chapter.slice(8),
-        vImage: vImage,
         hImage: hImageMod,
+        vImage: vImage,
       };
     });
 

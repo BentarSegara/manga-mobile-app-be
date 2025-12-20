@@ -1,12 +1,24 @@
 import puppeteer from "puppeteer";
 
-export const getChapterImages = async (chapterSlug) => {
-  const url = `https://komiku.org/${chapterSlug}`;
+export const getChapterImages = async (slug, chapter) => {
+  const baseUrl = `https://komiku.org/${slug}`;
+
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
 
   try {
-    await page.goto(url);
+    let response = await page.goto(`${baseUrl}-chapter-${chapter}`);
+
+    if (response.status() === 404) {
+      let chapterString;
+      if (chapter.length === 2) {
+        chapterString = chapter.slice(1);
+      } else {
+        chapterString = `0${chapter}`;
+      }
+      response = await page.goto(`${baseUrl}-chapter-${chapterString}`);
+    }
+
     const chapterImages = await page.evaluate(() => {
       const chapterContainer = document.querySelector("#Baca_Komik");
       const images = chapterContainer.querySelectorAll("img");

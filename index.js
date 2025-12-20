@@ -59,9 +59,9 @@ app.get("/manga/:slug", async (req, res) => {
 
 app.get("/chapter/:chapter_slug", async (req, res) => {
   const chapterSlug = req.params.chapter_slug;
-
+  const [slug, chapter] = chapterSlug.split("-chapter-");
   try {
-    const chapterImages = await getChapterImages(chapterSlug);
+    const chapterImages = await getChapterImages(slug, chapter);
     res.status(200).json({
       status: "Ok",
       message: "Data berhasil diambil",
