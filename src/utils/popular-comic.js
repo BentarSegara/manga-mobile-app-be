@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { getChapterSlug } from "../get-function/get-chapter-slug.js";
+import { getChapterSlug } from "./get-chapter-slug.js";
 
 export const getPopularComic = async () => {
   const browser = await puppeteer.launch({ headless: "new" });

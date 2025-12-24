@@ -1,11 +1,10 @@
-import { getComicByGenre } from "../api/comic-by-genre.js";
-import { getLatestComic } from "../api/latest-comic.js";
-import { getPopularComic } from "../api/popular-comic.js";
-import { searchComic } from "../api/search-comic.js";
-import { getTopComic } from "../api/top-comic.js";
+import { getComicByGenre } from "../utils/get-comic-by-genre.js";
+import { getLatestComic } from "../utils/latest-comic.js";
+import { getPopularComic } from "../utils/popular-comic.js";
+import { searchComic } from "../utils/search-comic.js";
+import { getTopComic } from "../utils/top-comic.js";
 
-export const getMangaSortBy = async (query) => {
-  const { sort, genre, page, q } = query;
+export const getMangaSortBy = async ({ sort, genre, page, q }) => {
   if (sort) {
     let dataToSend;
     try {

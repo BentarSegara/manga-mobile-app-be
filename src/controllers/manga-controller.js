@@ -1,20 +1,16 @@
-import express from "express";
-import { getPopularComic } from "./api/popular-comic.js";
-import { getTopComic } from "./api/top-comic.js";
-import { getLatestComic } from "./api/latest-comic.js";
-import { searchComic } from "./api/search-comic.js";
-import { getDetailComic } from "./api/detail-comic.js";
-import { getComicByGenre } from "./api/comic-by-genre.js";
-import { getChapterImages } from "./api/comic-chapter.js";
-import { getMangaSortBy } from "./get-function/get-manga-sort.js";
+import { getMangaSortBy } from "../services/manga-service.js";
+import { getChapterImages } from "../utils/get-comic-chapter.js";
+import { getDetailComic } from "../utils/get-detail-comic.js";
 
-const app = express();
-
-app.use(express.json());
-
-app.get("/manga", async (req, res) => {
+export const getManga = async (req, res) => {
+  const { sort, genre, page, q } = req.query;
   try {
-    const dataToSend = await getMangaSortBy(req.query);
+    const dataToSend = await getMangaSortBy({
+      sort: sort,
+      genre: genre,
+      page: page,
+      q: q,
+    });
 
     if (dataToSend) {
       res.status(200).json({
@@ -36,9 +32,9 @@ app.get("/manga", async (req, res) => {
       data: null,
     });
   }
-});
+};
 
-app.get("/manga/:slug", async (req, res) => {
+export const getMangaDetail = async (req, res) => {
   const mangaSlug = req.params.slug;
 
   try {
@@ -55,9 +51,9 @@ app.get("/manga/:slug", async (req, res) => {
       data: null,
     });
   }
-});
+};
 
-app.get("/chapter/:chapter_slug", async (req, res) => {
+export const getMangaChapterImages = async (req, res) => {
   const chapterSlug = req.params.chapter_slug;
   const [slug, chapter] = chapterSlug.split("-chapter-");
   try {
@@ -74,8 +70,4 @@ app.get("/chapter/:chapter_slug", async (req, res) => {
       data: null,
     });
   }
-});
-
-app.listen(3000, () => {
-  console.info("Server listening on port 3000");
-});
+};
