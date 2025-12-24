@@ -1,87 +1,94 @@
-import prisma from "../config/database.js";
-import { registerSchema } from "../validations/user-validation.js";
+import {
+  destroyUser,
+  getUser,
+  postUser,
+  updateUser,
+} from "../services/user-service.js";
 
-export const getUser = async (req, res) => {
-  const { id } = req.params;
-  const user = await prisma.user.findUnique({
-    where: {
-      id: parseInt(id),
-    },
-  });
-  return res.status(200).json({
-    status: "Ok",
-    message: "Data berhasil diambil",
-    data: user,
-  });
-};
-
-export const createUser = async (req, res) => {
+export const register = async (req, res) => {
   const newUser = req.body;
-  const { error } = registerSchema.validate(newUser, { abortEarly: false });
-
-  if (error) {
-    const errMessages = error.details.map((detail) => detail.message);
+  try {
+    const user = await postUser(newUser);
+    return res.status(201).json({
+      status: "Success",
+      message: "Berhasil mendaftarkan user",
+      data: user,
+    });
+  } catch (err) {
     return res.status(400).json({
-      status: "fail",
-      message: "gagal mendaftarkan user",
-      errors: errMessages,
+      status: "Fail",
+      message: "Gagal mendaftarkan user",
+      errors: err.message,
     });
   }
-
-  const user = await prisma.user.create({
-    data: {
-      name: newUser.name,
-      email: newUser.email,
-      password: newUser.password,
-    },
-  });
-
-  return res.status(201).json({
-    status: "success",
-    message: "berhasil mendaftarkan user",
-    data: user,
-  });
 };
 
-export const updateUser = async (req, res) => {
+export const login = async (req, res) => {
+  try {
+    const user = await getUser(req.body);
+
+    if (user) {
+      if (user.valid) {
+        return res.status(200).json({
+          status: "Success",
+          message: "Berhasil login",
+          data: user,
+        });
+      } else {
+        return res.status(401).json({
+          status: "Fail",
+          message: `Gagal login`,
+          error: "Password salah",
+        });
+      }
+    } else {
+      return res.status(404).json({
+        status: "Fail",
+        message: `Gagal login user`,
+        errors: "User tidak ditemukan",
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
+      status: "Fail",
+      message: `Gagal login user`,
+      errors: err.message,
+    });
+  }
+};
+
+export const editUser = async (req, res) => {
   const { id } = req.params;
   const newUserData = req.body;
 
-  const { error } = registerSchema.validate(newUserData, { abortEarly: false });
-
-  if (error) {
-    const errMessages = error.details.map((detail) => detail.message);
+  try {
+    const updateuser = await updateUser({ id: id, newData: newUserData });
+    return res.status(204).json({
+      status: "Success",
+      message: "Berhasil memperbarui data user",
+      data: updateuser,
+    });
+  } catch (err) {
     return res.status(400).json({
-      status: "fail",
-      message: "gagal memperbarui data user",
-      errors: errMessages,
+      status: "Fail",
+      message: "Gagal memperbarui data user",
+      errors: err.message,
     });
   }
-
-  const updateuser = await prisma.user.update({
-    where: {
-      id: parseInt(id),
-    },
-    data: newUserData,
-  });
-
-  return res.status(204).json({
-    status: "success",
-    message: "berhasil memperbarui data user",
-    data: updateuser,
-  });
 };
 
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
-  const deleteuser = await prisma.user.delete({
-    where: {
-      id: parseInt(id),
-    },
-  });
-
-  res.status(200).json({
-    status: "success",
-    message: "berhasil menghapus data user",
-  });
+  try {
+    const deleteuser = await destroyUser(id);
+    res.status(200).json({
+      status: "Success",
+      message: "Berhasil menghapus user",
+    });
+  } catch (err) {
+    res.status(400).json({
+      error: "Fail",
+      message: "Gagal ",
+    });
+  }
 };
