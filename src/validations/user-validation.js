@@ -9,12 +9,14 @@ export const nameRule = Joi.string().min(3).messages({
 
 export const emailRule = Joi.string().email().messages({
   "string.email": "Format email tidak valid",
+  "string.empty": "Email tidak boleh kosong",
   "any.required": "Email wajib diisi",
 });
 
 export const passwordRule = Joi.string().min(8).messages({
   "string.min": "Password harus memiliki minimal 8 karakter",
-  "any.required": "Password tidak boleh kosong",
+  "string.empty": "Password tidak boleh kosong",
+  "any.required": "Password wajib diisi",
 });
 
 export const registerSchema = Joi.object({

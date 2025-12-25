@@ -13,8 +13,12 @@ export const getUser = async ({ email, password }) => {
     { abortEarly: false }
   );
   if (error) {
-    const errorMessages = error.details.map((detail) => detail.message);
-    throw new Error(errorMessages);
+    const errors = {};
+    error.details.map((detail) => {
+      const label = detail.context.label;
+      return (errors[label] = detail.message);
+    });
+    throw errors;
   }
 
   const user = await prisma.user.findUnique({
@@ -27,49 +31,50 @@ export const getUser = async ({ email, password }) => {
     return null;
   }
 
-  try {
-    const match = await bcrypt.compare(password, user.password);
-    if (match) {
-      const { id, password, ...userToSend } = user;
-      return {
-        valid: true,
-        user: userToSend,
-      };
-    } else {
-      return {
-        valid: false,
-        user: null,
-      };
-    }
-  } catch (err) {
-    throw new Error(err.message);
+  const match = await bcrypt.compare(password, user.password);
+  if (match) {
+    const { password, ...userToSend } = user;
+    return {
+      valid: true,
+      user: userToSend,
+    };
+  } else {
+    return {
+      valid: false,
+      user: null,
+    };
   }
 };
 
 export const postUser = async (userData) => {
   const { error } = registerSchema.validate(userData, { abortEarly: false });
   if (error) {
-    const errorMessages = error.details.map((detail) => detail.context);
-
-    throw new Error(errorMessages);
+    const errors = {};
+    error.details.map((detail) => {
+      const label = detail.context.label;
+      return (errors[label] = detail.message);
+    });
+    throw errors;
   }
 
   userData.password = await bcrypt.hash(userData.password, 10);
-  console.log(userData);
-
   const user = await prisma.user.create({
     data: userData,
   });
-
-  return user;
+  const { password, ...userToSend } = user;
+  return userToSend;
 };
 
 export const updateUser = async ({ id, newData }) => {
   const { error } = updateSchema.validate(newData, { abortEarly: false });
 
   if (error) {
-    const errMessages = error.details.map((detail) => detail.message);
-    throw new Error(errMessages);
+    const errors = {};
+    error.details.map((detail) => {
+      const label = detail.context.label;
+      return (errors[label] = detail.message);
+    });
+    throw errors;
   }
 
   await prisma.user.update({

@@ -11,7 +11,7 @@ const router = express.Router();
 router.get("/", (_, res) => {
   return res.status(404).send("There is nothing here");
 });
-router.get("/login", login);
+router.post("/login", login);
 router.post("/register", register);
 router.patch("/update/:id", editUser);
 router.delete("/delete/:id", deleteUser);
