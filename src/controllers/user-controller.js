@@ -1,8 +1,10 @@
 import {
+  confirmEmail,
   destroyUser,
   getUser,
   postUser,
   updateUser,
+  updateUserPassword,
 } from "../services/user-service.js";
 
 export const register = async (req, res) => {
@@ -81,6 +83,24 @@ export const editUser = async (req, res) => {
   }
 };
 
+export const editUserPassword = async (req, res) => {
+  const { email, passwords } = req.body;
+
+  try {
+    await updateUserPassword({ email: email, passwords: passwords });
+    res.status(200).json({
+      status: "Success",
+      message: "Berhasil memperbarui password user",
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: "Fail",
+      message: "Gagal memperbarui password user",
+      errors: err,
+    });
+  }
+};
+
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -93,6 +113,33 @@ export const deleteUser = async (req, res) => {
     res.status(400).json({
       status: "Fail",
       message: "Gagal menghapus data user",
+    });
+  }
+};
+
+export const checkUserEmail = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await confirmEmail(email);
+    if (user) {
+      return res.status(200).json({
+        status: "Success",
+        message: "Email terkonfirmasi",
+      });
+    } else {
+      return res.status(404).json({
+        status: "Success",
+        message: "Email tidak terkonfirmasi",
+        errors: {
+          email: "Email tidak ditemukan di daftar user",
+        },
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: "Fail",
+      message: "Gagal mengambil data user",
+      errors: err,
     });
   }
 };

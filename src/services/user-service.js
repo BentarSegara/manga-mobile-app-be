@@ -1,7 +1,10 @@
 import prisma from "../config/database.js";
+import { mapError } from "../utils/map-error.js";
 import {
+  confirmEmailSchema,
   loginSchema,
   registerSchema,
+  updatePassSchema,
   updateSchema,
 } from "../validations/user-validation.js";
 
@@ -13,11 +16,7 @@ export const getUser = async ({ email, password }) => {
     { abortEarly: false }
   );
   if (error) {
-    const errors = {};
-    error.details.map((detail) => {
-      const label = detail.context.label;
-      return (errors[label] = detail.message);
-    });
+    const errors = mapError(error);
     throw errors;
   }
 
@@ -49,11 +48,7 @@ export const getUser = async ({ email, password }) => {
 export const postUser = async (userData) => {
   const { error } = registerSchema.validate(userData, { abortEarly: false });
   if (error) {
-    const errors = {};
-    error.details.map((detail) => {
-      const label = detail.context.label;
-      return (errors[label] = detail.message);
-    });
+    const errors = mapError(error);
     throw errors;
   }
 
@@ -67,13 +62,8 @@ export const postUser = async (userData) => {
 
 export const updateUser = async ({ id, newData }) => {
   const { error } = updateSchema.validate(newData, { abortEarly: false });
-
   if (error) {
-    const errors = {};
-    error.details.map((detail) => {
-      const label = detail.context.label;
-      return (errors[label] = detail.message);
-    });
+    const errors = mapError(error);
     throw errors;
   }
 
@@ -82,6 +72,24 @@ export const updateUser = async ({ id, newData }) => {
       id: parseInt(id),
     },
     data: newData,
+  });
+};
+
+export const updateUserPassword = async ({ email, passwords }) => {
+  const { error } = updatePassSchema.validate(passwords, { abortEarly: false });
+  if (error) {
+    const errors = mapError(error);
+    throw errors;
+  }
+
+  passwords.password = await bcrypt.hash(passwords.password, 10);
+  await prisma.user.update({
+    where: {
+      email: email,
+    },
+    data: {
+      password: passwords.password,
+    },
   });
 };
 
@@ -95,4 +103,17 @@ export const destroyUser = async (id) => {
   } catch (err) {
     throw new Error(err.message);
   }
+};
+
+export const confirmEmail = async (email) => {
+  const { error } = confirmEmailSchema.validate({ email: email });
+  if (error) {
+    const errors = mapError(error);
+    throw errors;
+  }
+  return await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
 };

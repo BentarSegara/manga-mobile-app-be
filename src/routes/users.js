@@ -1,7 +1,9 @@
 import express from "express";
 import {
+  checkUserEmail,
   deleteUser,
   editUser,
+  editUserPassword,
   login,
   register,
 } from "../controllers/user-controller.js";
@@ -13,7 +15,9 @@ router.get("/", (_, res) => {
 });
 router.post("/login", login);
 router.post("/register", register);
-router.patch("/update/:id", editUser);
-router.delete("/delete/:id", deleteUser);
+router.post("/confirm-email", checkUserEmail);
+router.patch("/reset-password", editUserPassword);
+router.patch("/:id/update", editUser);
+router.delete("/:id/delete", deleteUser);
 
 export default router;
