@@ -3,7 +3,7 @@ import Joi from "joi";
 const nameRule = Joi.string().min(3).messages({
   "string.base": "Username harus berupa teks",
   "string.empty": "Username tidak boleh kosong",
-  "string.min": "Username minimal harus memiliki karakter",
+  "string.min": "Username minimal harus memiliki 3 karakter",
   "any.required": "Username wajib diisi",
 });
 

@@ -50,7 +50,7 @@ export const login = async (req, res) => {
         status: "Fail",
         message: `Gagal login user`,
         errors: {
-          name: "email tidak ditemukan dalam daftar user",
+          email: "email tidak ditemukan dalam daftar user",
         },
       });
     }
@@ -113,6 +113,7 @@ export const deleteUser = async (req, res) => {
     res.status(400).json({
       status: "Fail",
       message: "Gagal menghapus data user",
+      error: err.message,
     });
   }
 };
